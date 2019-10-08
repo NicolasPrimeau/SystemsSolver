@@ -1,6 +1,7 @@
 from typing import Optional
 
 from systemssolver.methods.solvermethod import SolverMethod
+from systemssolver.modeling.objective import convert_max_objective_to_min
 from systemssolver.problem import Problem
 from systemssolver.solution import Solution
 from systemssolver.tracing.hook import TracingHook
@@ -17,6 +18,12 @@ class SimplexSolver(SolverMethod):
     def solve(self, problem: Problem, tracing_hook: TracingHook = None) -> Optional[Solution]:
         if not self.can_solve(problem):
             return None
+
+        objective = problem.objectives[0]
+
+        # Standard form,
+        # (1) must be a maximization problem,
+        min_objective = convert_max_objective_to_min(objective)
 
         # Standard form,
         # (1) must be a maximization problem,

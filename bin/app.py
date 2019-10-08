@@ -1,4 +1,4 @@
-from systemssolver.interface.solver import SolverGUI
+from systemssolver.interface.solver_gui import SolverGUI
 
 
 def main():

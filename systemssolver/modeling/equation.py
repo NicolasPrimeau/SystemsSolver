@@ -47,6 +47,9 @@ class Expression:
             total += value
         return total
 
+    def is_equivalent(self, other) -> bool:
+        return set(self.terms) == set(other.terms)
+
     def simplify(self):
         terms = dict()
         for term in self.terms:
@@ -63,6 +66,9 @@ class Expression:
             else:
                 terms.append("- {}{}".format(abs(term.coef.val), term.var.name))
         return ' '.join(terms)
+
+    def __neg__(self):
+        return Expression([-term for term in self.terms])
 
     def __eq__(self, other):
         if not isinstance(other, Expression):
