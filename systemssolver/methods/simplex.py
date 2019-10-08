@@ -46,7 +46,7 @@ class Tableau:
 
     def _build_tableau(self):
         self._var_order = list(sorted(self._get_variables(), key=lambda var: var.name))
-        tableau = [[0 for _ in range(len(self._var_order) + 1)] or _ in range(len(self._constraints) + 1)]
+        tableau = [[0 for _ in range(len(self._var_order) + 1)] for _ in range(len(self._constraints) + 1)]
 
         for row_idx, constraint in enumerate(self._constraints):
             for term in constraint.left.terms:
