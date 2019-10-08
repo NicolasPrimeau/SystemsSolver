@@ -1,4 +1,7 @@
+from systemssolver.solution import Solution
 
 
 class TracingHook:
-    pass
+
+    def step(self, solution: Solution):
+        pass

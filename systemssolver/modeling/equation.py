@@ -158,7 +158,9 @@ class Expression:
 class Constraint:
 
     def __init__(self, left: Expression, right: Expression, sign: EqualitySigns):
-        self.left, self.right, self.sign = left, right, sign
+        self.left: Expression = left
+        self.right: Expression = right
+        self.sign = sign
 
     def is_satisfied(self):
         return self.sign.apply(self.left, self.right)
