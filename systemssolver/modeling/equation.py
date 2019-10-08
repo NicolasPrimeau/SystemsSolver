@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import List
 
-from systemssolver.solver.modeling.variables import Term, Coefficient
+from systemssolver.modeling import Term, Coefficient
 
 
 class EqualitySigns(Enum):

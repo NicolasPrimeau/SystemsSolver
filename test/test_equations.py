@@ -1,7 +1,7 @@
 import unittest
 
-from systemssolver.solver.modeling.equation import Expression, Constraint, EqualitySigns
-from systemssolver.solver.modeling.variables import Term, Variable, Coefficient, Constant
+from systemssolver.modeling.equation import Expression, Constraint, EqualitySigns
+from systemssolver.modeling import Term, Variable, Coefficient, Constant
 
 
 class EquationsTest(unittest.TestCase):

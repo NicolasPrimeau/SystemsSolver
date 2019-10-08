@@ -1,7 +1,7 @@
 from typing import List
 
-from systemssolver.solver.modeling.equation import Constraint
-from systemssolver.solver.modeling.objective import Objective
+from systemssolver.modeling.equation import Constraint
+from systemssolver.modeling.objective import Objective
 
 
 class Problem:

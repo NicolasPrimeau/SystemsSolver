@@ -1,6 +1,6 @@
 from enum import Enum
 
-from systemssolver.solver.modeling.equation import Expression
+from systemssolver.modeling.equation import Expression
 
 
 class ObjectiveGoal(Enum):

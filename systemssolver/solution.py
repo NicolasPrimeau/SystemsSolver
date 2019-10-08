@@ -1,4 +1,4 @@
-from systemssolver.solver.problem import Problem
+from systemssolver.problem import Problem
 
 
 class Solution:
