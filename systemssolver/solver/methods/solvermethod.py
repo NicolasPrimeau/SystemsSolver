@@ -1,10 +1,10 @@
 from abc import ABC, abstractmethod
 
-from project1.solver.problem import Problem
-from project1.solver.solution import Solution
+from systemssolver.solver.problem import Problem
+from systemssolver.solver.solution import Solution
 
 
-class Solver(ABC):
+class SolverMethod(ABC):
 
     @abstractmethod
     def can_solve(self, problem: Problem) -> bool:
