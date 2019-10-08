@@ -33,7 +33,8 @@ class Tableau:
 
         self._tableau = self._create_new_tableau(pivot_row, pivot_col)
         print(' '.join(map(str, self._variables)))
-        print(self._tableau)
+        for row in self._tableau:
+            print(row)
         input()
         return self._check_optimal()
 
@@ -63,9 +64,17 @@ class Tableau:
 
         for col_idx, val in enumerate(self._tableau[pivot_row]):
             new_tableau[pivot_row][col_idx] /= pivot_var_val
-        print(new_tableau)
-        for row_idx, row in enumerate(self._tableau):
+
+        print(' '.join(map(str, self._variables)))
+        for row in new_tableau:
+            print(row)
+        print()
+
+        for row_idx, row in filter(lambda i_r: i_r[0] != pivot_row, enumerate(new_tableau)):
             row_multiplier = row[pivot_col] / pivot_var_val
+            print(row_idx)
+            print(row)
+            print(row_multiplier)
             for col_idx, val in enumerate(row):
                 new_tableau[row_idx][col_idx] -= row_multiplier * self._tableau[row_idx][col_idx]
         return new_tableau
