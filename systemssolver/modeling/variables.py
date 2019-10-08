@@ -49,6 +49,30 @@ class Coefficient:
     def __eq__(self, other):
         return isinstance(other, Coefficient) and other.val == self.val
 
+    def __add__(self, other):
+        if isinstance(other, Coefficient):
+            return self.val + other.val
+        else:
+            return self.val + other
+
+    def __sub__(self, other):
+        if isinstance(other, Coefficient):
+            return self.val - other.val
+        else:
+            return self.val - other
+
+    def __mul__(self, other):
+        if isinstance(other, Coefficient):
+            return self.val * other.val
+        else:
+            return self.val * other
+
+    def __truediv__(self, other):
+        if isinstance(other, Coefficient):
+            return self.val / other.val
+        else:
+            return self.val / other
+
     def __str__(self):
         return str(self.val) if self.val >= 0 else '-{}'.format(self.val)
 
@@ -76,8 +100,8 @@ class Constant(Variable):
 class Term:
 
     def __init__(self, var: Variable, coef: Coefficient = None):
-        self.var = var
-        self.coef = coef if coef else Coefficient(val=1)
+        self.var: Variable = var
+        self.coef: Coefficient = coef if coef else Coefficient(val=1)
 
     def evaluate(self):
         if not self.var.val:
