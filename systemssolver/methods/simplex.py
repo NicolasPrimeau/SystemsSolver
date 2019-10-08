@@ -15,20 +15,66 @@ class Tableau:
         self._objective = objective
         self._constraints = constraints
         self._check_valid()
-        self._tableau = self._build_tableau()
+        self._variables, self._tableau = self._build_tableau()
 
     def step(self) -> bool:
-        # Pivot variables
+        if self._check_optimal():
+            return True
 
-        # Creating a new tableau
+        pivot_col = self._identify_pivot_col()
+        pivot_row = self._identify_pivot_row(pivot_col)
 
-        # Checking for optimality
+        self._tableau = self._create_new_tableau(pivot_row, pivot_col)
 
-        # Identify optimal values
-        pass
+        return self._check_optimal()
 
     def to_solution(self) -> Solution:
-        pass
+        optimal_variables = set()
+        for var_idx, var in enumerate(self._variables):
+            optimal_row_idx = None
+            for row_idx, row in enumerate(self._tableau):
+                if row[var_idx] == 1 and optimal_row_idx is None:
+                    optimal_row_idx = row_idx
+                elif row[var_idx] == 1:
+                    optimal_row_idx = None
+                    break
+            if optimal_row_idx is None:
+                optimal_variables.add(Variable(name=var.name, val=0))
+            else:
+                optimal_variables.add(Variable(name=var.name, val=self._tableau[optimal_row_idx][-1]))
+        return Solution(optimal_variables)
+
+    def _check_optimal(self) -> bool:
+        return all(val >= 0 for val in self._tableau[-1][:-1])
+
+    def _create_new_tableau(self, pivot_row, pivot_col):
+
+        pivot_var_val = self._tableau[pivot_row][pivot_col]
+
+        new_tableau = [list(x) for x in self._tableau]
+
+        for row_idx, row in enumerate(self._tableau):
+            row_multiplier = row[pivot_col] / pivot_var_val
+            for col_idx, val in enumerate(row):
+                if row_idx == pivot_row:
+                    new_tableau[row_idx][col_idx] /= pivot_var_val
+                else:
+                    new_tableau[row_idx][col_idx] -= row_multiplier * self._tableau[row_idx][col_idx]
+        return new_tableau
+
+    def _identify_pivot_row(self, pivot_col) -> int:
+        smallest_idx = None
+        smallest_rh = None
+        for idx, row in enumerate(self._tableau[:-1]):
+            pivot_col_val = row[pivot_col]
+            rh_indicator = row[-1] / pivot_col_val
+            if smallest_idx is None or rh_indicator < smallest_rh:
+                smallest_idx = idx
+                smallest_rh = rh_indicator
+        return smallest_idx
+
+    def _identify_pivot_col(self) -> int:
+        return min(range(0, len(self._tableau[-1]) - 1), key=lambda idx: self._tableau[-1][idx])
 
     def _check_valid(self):
         for term in self._objective.terms:
@@ -45,19 +91,19 @@ class Tableau:
                 raise RuntimeError()
 
     def _build_tableau(self):
-        self._var_order = list(sorted(self._get_variables(), key=lambda var: var.name))
-        tableau = [[0 for _ in range(len(self._var_order) + 1)] for _ in range(len(self._constraints) + 1)]
+        variables = list(sorted(self._get_variables(), key=lambda var: var.name))
+        tableau = [[0 for _ in range(len(variables) + 1)] for _ in range(len(self._constraints) + 1)]
 
         for row_idx, constraint in enumerate(self._constraints):
             for term in constraint.left.terms:
-                var_idx = self._var_order.index(term.var)
+                var_idx = variables.index(term.var)
                 tableau[row_idx][var_idx] = term.coef.val
             tableau[row_idx][-1] = constraint.right.terms[0].var.val
 
         for term in self._objective.terms:
-            var_idx = self._var_order.index(term.var)
+            var_idx = variables.index(term.var)
             tableau[-1][var_idx] = term.coef.val
-        return tableau
+        return variables, tableau
 
     def _get_variables(self) -> Set[Variable]:
         variables = set()
