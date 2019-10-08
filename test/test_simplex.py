@@ -5,6 +5,7 @@ from systemssolver.modeling.equation import Expression, Constraint, EqualitySign
 from systemssolver.modeling.objective import Objective, ObjectiveGoal
 from systemssolver.modeling.variables import Term, Variable, Constant
 from systemssolver.problem import Problem
+from systemssolver.tracing.hook import PrintSolutionHook
 
 
 class SimplexTest(unittest.TestCase):
@@ -30,12 +31,10 @@ class SimplexTest(unittest.TestCase):
         ]), right=Expression(terms=[Term(var=Constant(name="c2", val=8))]), sign=EqualitySigns.LE))
 
         solver = SimplexSolver()
-        solution = solver.solve(problem)
+        solution = solver.solve(problem, tracing_hook=PrintSolutionHook())
 
         expected_vals = {'x1': 8, 'x2': 0, 'x3': 0, 's0': 2, 's1': 0, 'z': 64}
-        for var in solution.variables:
-            print(var.name)
-            print(var.val)
-            
+        print(str(solution))
+
         for var in solution.variables:
             self.assertEqual(expected_vals.get(var.name), var.val)

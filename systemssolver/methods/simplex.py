@@ -1,5 +1,5 @@
 import logging
-from typing import Optional, List, Set
+from typing import Optional, List
 
 from systemssolver.methods.solvermethod import SolverMethod
 from systemssolver.modeling.equation import EqualitySigns, convert_constraint_to, Constraint, Expression
@@ -16,7 +16,8 @@ class Tableau:
         self._objective = objective
         self._constraints = constraints
         self._check_valid()
-        self._variables, self._tableau = self._build_tableau()
+        self._variables = self._get_variables()
+        self._tableau = self._build_tableau()
 
     def step(self) -> bool:
         if self._check_optimal():
@@ -25,8 +26,15 @@ class Tableau:
         pivot_col = self._identify_pivot_col()
         pivot_row = self._identify_pivot_row(pivot_col)
 
-        self._tableau = self._create_new_tableau(pivot_row, pivot_col)
+        print(pivot_col)
+        print(self._variables[pivot_col])
+        print(pivot_row)
+        input()
 
+        self._tableau = self._create_new_tableau(pivot_row, pivot_col)
+        print(' '.join(map(str, self._variables)))
+        print(self._tableau)
+        input()
         return self._check_optimal()
 
     def to_solution(self) -> Solution:
@@ -51,16 +59,15 @@ class Tableau:
     def _create_new_tableau(self, pivot_row, pivot_col):
 
         pivot_var_val = self._tableau[pivot_row][pivot_col]
-
         new_tableau = [list(x) for x in self._tableau]
 
+        for col_idx, val in enumerate(self._tableau[pivot_row]):
+            new_tableau[pivot_row][col_idx] /= pivot_var_val
+        print(new_tableau)
         for row_idx, row in enumerate(self._tableau):
             row_multiplier = row[pivot_col] / pivot_var_val
             for col_idx, val in enumerate(row):
-                if row_idx == pivot_row:
-                    new_tableau[row_idx][col_idx] /= pivot_var_val
-                else:
-                    new_tableau[row_idx][col_idx] -= row_multiplier * self._tableau[row_idx][col_idx]
+                new_tableau[row_idx][col_idx] -= row_multiplier * self._tableau[row_idx][col_idx]
         return new_tableau
 
     def _identify_pivot_row(self, pivot_col) -> int:
@@ -89,7 +96,6 @@ class Tableau:
                     "All constraints must be formulated as {} with a slack variable".format(EqualitySigns.EQUAL.value))
                 raise RuntimeError
             for term in constraint.left.terms:
-                print(term.coef)
                 if term.coef < 0:
                     logging.error("All coefficients can't be negative")
                     raise RuntimeError()
@@ -98,21 +104,22 @@ class Tableau:
                 raise RuntimeError()
 
     def _build_tableau(self):
-        variables = list(sorted(self._get_variables(), key=lambda var: var.name))
-        tableau = [[0 for _ in range(len(variables) + 1)] for _ in range(len(self._constraints) + 1)]
+        tableau = [[0 for _ in range(len(self._variables) + 1)] for _ in range(len(self._constraints) + 1)]
 
         for row_idx, constraint in enumerate(self._constraints):
             for term in constraint.left.terms:
-                var_idx = variables.index(term.var)
+                var_idx = self._variables.index(term.var)
                 tableau[row_idx][var_idx] = term.coef
             tableau[row_idx][-1] = constraint.right.terms[0].var.val
 
         for term in self._objective.terms:
-            var_idx = variables.index(term.var)
-            tableau[-1][var_idx] = term.coef
-        return variables, tableau
+            var_idx = self._variables.index(term.var)
+            tableau[-1][var_idx] = -term.coef
 
-    def _get_variables(self) -> Set[Variable]:
+        tableau[-1][self._variables.index(self._optimization_var)] = 1
+        return tableau
+
+    def _get_variables(self) -> List[Variable]:
         variables = set()
 
         for term in self._objective.terms:
@@ -127,8 +134,9 @@ class Tableau:
         while obj_var in variables:
             obj_var = Variable(name="z{}".format(i))
             i += 1
+        self._optimization_var = obj_var
         variables.add(obj_var)
-        return variables
+        return list(sorted(variables, key=lambda var: var.name))
 
 
 class SimplexSolver(SolverMethod):

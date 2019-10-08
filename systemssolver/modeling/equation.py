@@ -62,7 +62,7 @@ class Expression:
         terms = dict()
         for term in self.terms:
             if term.var not in terms:
-                terms[term.var] = term.coef
+                terms[term.var] = 0
             terms[term.var] += term.coef
         self._terms = [Term(var=var, coef=coef) for var, coef in terms.items()]
 
