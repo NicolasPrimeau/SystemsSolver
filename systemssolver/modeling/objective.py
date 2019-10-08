@@ -25,7 +25,7 @@ class Objective:
         return isinstance(other, Objective) and self.expression == other.expression and other.goal == self.goal
 
 
-def convert_min_objective_to_max(obj: Objective) -> Objective:
-    if obj.goal == ObjectiveGoal.MAXIMIZE:
+def convert_objective_to_goal(obj: Objective, goal: ObjectiveGoal) -> Objective:
+    if obj.goal == goal:
         return obj
-    return Objective(expression=-obj.expression, goal=ObjectiveGoal.MAXIMIZE)
+    return Objective(expression=-obj.expression, goal=goal)

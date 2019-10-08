@@ -66,6 +66,9 @@ class Expression:
             terms[term.var] += term.coef
         self._terms = [Term(var=var, coef=coef) for var, coef in terms.items()]
 
+    def copy(self):
+        return Expression([term.copy() for term in self.terms])
+
     def __str__(self):
         terms = list()
         for term in self.terms:
@@ -80,38 +83,45 @@ class Expression:
 
     def __add__(self, other):
         if isinstance(other, Coefficient):
-            for coef in self.coefficients:
-                coef.val = coef.val + other.val
-            return self
+            terms = [term.copy() for term in self.terms]
+            for term in terms:
+                term.coef += other
+            return Expression(terms)
         elif isinstance(other, Expression):
-            self.terms.extend(other.terms)
-            self.simplify()
-            return self
+            terms = [term.copy() for term in self.terms]
+            terms.extend(other.terms)
+            exp = Expression(terms)
+            exp.simplify()
+            return exp
         raise NotImplementedError()
 
     def __sub__(self, other):
         if isinstance(other, Coefficient):
-            for coef in self.coefficients:
-                coef.val = coef.val - other.val
-            return self
+            terms = [term.copy() for term in self.terms]
+            for term in terms:
+                term.coef -= other
+            return Expression(terms)
         elif isinstance(other, Expression):
-            var_coefs = self.var_coef_view()
+            exp = self.copy()
+            var_coefs = exp.var_coef_view()
             for var, item in other.var_coef_view().items():
                 if var not in var_coefs:
                     var_coefs[var] = Coefficient(val=0)
                 var_coefs[var] -= item
-            self._terms = [Term(var=var, coef=coef) for var, coef in var_coefs.items()]
-            return self
+            exp._terms = [Term(var=var, coef=coef) for var, coef in var_coefs.items()]
+            return exp
         raise NotImplementedError()
 
     def __mul__(self, other):
-        for coef in self.coefficients:
-            coef.val *= other
+        terms = [term.copy() for term in self.terms]
+        for term in terms:
+            term.coef *= other
         return self
 
     def __truediv__(self, other):
-        for coef in self.coefficients:
-            coef /= other
+        terms = [term.copy() for term in self.terms]
+        for term in terms:
+            term.coef /= other
         return self
 
     def __eq__(self, other):

@@ -12,7 +12,6 @@ class EquationsTest(unittest.TestCase):
         expression.add_term(Term(var=Variable('b', 5), coef=Coefficient(-2)))
         expression.add_term(Term(var=Variable('c', 4), coef=Coefficient(5)))
         val = expression.evaluate()
-        print(str(expression))
         self.assertEqual(2 - 2 * 5 + 5 * 4, val)
 
     def test_constraints(self):

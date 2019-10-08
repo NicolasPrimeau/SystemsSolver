@@ -46,6 +46,9 @@ class Coefficient:
     def val(self, new_val):
         self._val = new_val
 
+    def copy(self):
+        return Coefficient(val=self.val)
+
     def __eq__(self, other):
         return isinstance(other, Coefficient) and other.val == self.val
 
@@ -107,6 +110,9 @@ class Term:
         if not self.var.val:
             return None
         return self.var.val * self.coef.val
+
+    def copy(self):
+        return Term(var=self.var, coef=self.coef.copy())
 
     def __hash__(self):
         return hash((self.var, self.coef.val))
