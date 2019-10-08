@@ -33,56 +33,6 @@ class Variable:
         return self.name
 
 
-class Coefficient:
-
-    def __init__(self, val):
-        self._val = val
-
-    @property
-    def val(self):
-        return self._val
-
-    @val.setter
-    def val(self, new_val):
-        self._val = new_val
-
-    def copy(self):
-        return Coefficient(val=self.val)
-
-    def __eq__(self, other):
-        return isinstance(other, Coefficient) and other.val == self.val
-
-    def __add__(self, other):
-        if isinstance(other, Coefficient):
-            return self.val + other.val
-        else:
-            return self.val + other
-
-    def __sub__(self, other):
-        if isinstance(other, Coefficient):
-            return self.val - other.val
-        else:
-            return self.val - other
-
-    def __mul__(self, other):
-        if isinstance(other, Coefficient):
-            return self.val * other.val
-        else:
-            return self.val * other
-
-    def __truediv__(self, other):
-        if isinstance(other, Coefficient):
-            return self.val / other.val
-        else:
-            return self.val / other
-
-    def __str__(self):
-        return str(self.val) if self.val >= 0 else '-{}'.format(self.val)
-
-    def __neg__(self):
-        return Coefficient(val=-self.val)
-
-
 class Constant(Variable):
 
     def __init__(self, name, val):
@@ -102,20 +52,20 @@ class Constant(Variable):
 
 class Term:
 
-    def __init__(self, var: Variable, coef: Coefficient = None):
+    def __init__(self, var: Variable, coef=1):
         self.var: Variable = var
-        self.coef: Coefficient = coef if coef else Coefficient(val=1)
+        self.coef = coef
 
     def evaluate(self):
         if not self.var.val:
             return None
-        return self.var.val * self.coef.val
+        return self.var.val * self.coef
 
     def copy(self):
-        return Term(var=self.var, coef=self.coef.copy())
+        return Term(var=self.var, coef=self.coef)
 
     def __hash__(self):
-        return hash((self.var, self.coef.val))
+        return hash((self.var, self.coef))
 
     def __eq__(self, other):
         return isinstance(other, Term) and other.var == self.var and other.coef == self.coef

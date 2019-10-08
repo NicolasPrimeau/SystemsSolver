@@ -10,8 +10,11 @@ class Problem:
         self._objective_functions: List[Objective] = list()
         self._constraints: List[Constraint] = list()
 
-    def append_objective_function(self, obj: Objective):
+    def add_objective(self, obj: Objective):
         self._objective_functions.append(obj)
+
+    def add_constraint(self, obj: Constraint):
+        self._constraints.append(obj)
 
     @property
     def objectives(self) -> List[Objective]:

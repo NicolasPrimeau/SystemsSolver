@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import List, Dict
 
-from systemssolver.modeling.variables import Coefficient, Term, Variable
+from systemssolver.modeling.variables import Term
 
 
 class EqualitySigns(Enum):
@@ -39,10 +39,10 @@ class Expression:
         return self._terms
 
     @property
-    def coefficients(self) -> List[Coefficient]:
+    def coefficients(self) -> List:
         return [term.coef for term in self.terms]
 
-    def var_coef_view(self) -> Dict[Variable, Coefficient]:
+    def var_coef_view(self) -> Dict:
         self.simplify()
         return {term.var: term.coef for term in self.terms}
 
@@ -82,11 +82,12 @@ class Expression:
         return Expression([-term for term in self.terms])
 
     def __add__(self, other):
-        if isinstance(other, Coefficient):
+        if isinstance(other, Term):
             terms = [term.copy() for term in self.terms]
-            for term in terms:
-                term.coef += other
-            return Expression(terms)
+            terms.append(other)
+            exp = Expression(terms)
+            exp.simplify()
+            return exp
         elif isinstance(other, Expression):
             terms = [term.copy() for term in self.terms]
             terms.extend(other.terms)
@@ -96,17 +97,22 @@ class Expression:
         raise NotImplementedError()
 
     def __sub__(self, other):
-        if isinstance(other, Coefficient):
-            terms = [term.copy() for term in self.terms]
-            for term in terms:
-                term.coef -= other
-            return Expression(terms)
+        if isinstance(other, Term):
+            exp = self.copy()
+            var_coefs = exp.var_coef_view()
+
+            if other.var not in var_coefs:
+                var_coefs[other.var] = -other.coef
+            else:
+                var_coefs[other.var] -= other.coef
+            exp._terms = [Term(var=var, coef=coef) for var, coef in var_coefs.items()]
+            return exp
         elif isinstance(other, Expression):
             exp = self.copy()
             var_coefs = exp.var_coef_view()
             for var, item in other.var_coef_view().items():
                 if var not in var_coefs:
-                    var_coefs[var] = Coefficient(val=0)
+                    var_coefs[var] = 0
                 var_coefs[var] -= item
             exp._terms = [Term(var=var, coef=coef) for var, coef in var_coefs.items()]
             return exp
@@ -172,4 +178,4 @@ class Constraint:
 def convert_constraint_to(constraint: Constraint, sign: EqualitySigns):
     if constraint.sign == sign:
         return constraint
-    pass
+    raise NotImplementedError()

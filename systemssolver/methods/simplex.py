@@ -1,9 +1,10 @@
+import logging
 from typing import Optional, List, Set
 
 from systemssolver.methods.solvermethod import SolverMethod
 from systemssolver.modeling.equation import EqualitySigns, convert_constraint_to, Constraint, Expression
 from systemssolver.modeling.objective import ObjectiveGoal, convert_objective_to_goal
-from systemssolver.modeling.variables import Variable
+from systemssolver.modeling.variables import Variable, Term
 from systemssolver.problem import Problem
 from systemssolver.solution import Solution
 from systemssolver.tracing.hook import TracingHook
@@ -78,16 +79,22 @@ class Tableau:
 
     def _check_valid(self):
         for term in self._objective.terms:
-            if term.coef.val < 0:
+            if term.coef < 0:
+                logging.error("Coef can't be negative")
                 raise RuntimeError()
 
         for constraint in self._constraints:
-            if constraint.sign != EqualitySigns.LE:
+            if constraint.sign != EqualitySigns.EQUAL:
+                logging.error(
+                    "All constraints must be formulated as {} with a slack variable".format(EqualitySigns.EQUAL.value))
                 raise RuntimeError
             for term in constraint.left.terms:
-                if term.coef.val < 0:
+                print(term.coef)
+                if term.coef < 0:
+                    logging.error("All coefficients can't be negative")
                     raise RuntimeError()
             if len(constraint.right.terms) != 1:
+                logging.error("All constraints must have a one constant on right hand side")
                 raise RuntimeError()
 
     def _build_tableau(self):
@@ -97,12 +104,12 @@ class Tableau:
         for row_idx, constraint in enumerate(self._constraints):
             for term in constraint.left.terms:
                 var_idx = variables.index(term.var)
-                tableau[row_idx][var_idx] = term.coef.val
+                tableau[row_idx][var_idx] = term.coef
             tableau[row_idx][-1] = constraint.right.terms[0].var.val
 
         for term in self._objective.terms:
             var_idx = variables.index(term.var)
-            tableau[-1][var_idx] = term.coef.val
+            tableau[-1][var_idx] = term.coef
         return variables, tableau
 
     def _get_variables(self) -> Set[Variable]:
@@ -145,9 +152,9 @@ class SimplexSolver(SolverMethod):
 
         # Introducing slack variables: additional variables that make inequalities to
         # equal. The new system is called canonical form.
-        slack_variables = [Variable(name="s{}".format(i) for i in range(len(lte_constraints)))]
+        slack_variables = [Variable(name="s{}".format(i)) for i in range(len(lte_constraints))]
         slacked_constraints = [
-            Constraint(left=constraint.left + slack, right=constraint.right, sign=EqualitySigns.EQUAL)
+            Constraint(left=constraint.left + Term(var=slack), right=constraint.right, sign=EqualitySigns.EQUAL)
             for constraint, slack in zip(lte_constraints, slack_variables)
         ]
 
