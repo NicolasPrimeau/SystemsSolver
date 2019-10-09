@@ -96,6 +96,8 @@ document.addEventListener("DOMContentLoaded", function(){
             document.getElementById("objectiveExpression").value = "";
             refreshObjectives();
             refreshVariables();
+            const myNode = document.getElementById("solutionValues");
+            clearElements(myNode);
         };
     });
 
@@ -115,6 +117,8 @@ document.addEventListener("DOMContentLoaded", function(){
             document.getElementById("constraintRight").value = "";
             refreshConstraints();
             refreshVariables();
+            const myNode = document.getElementById("solutionValues");
+            clearElements(myNode);
         };
     });
 
@@ -131,7 +135,11 @@ document.addEventListener("DOMContentLoaded", function(){
         consRequest.onload = function() {
             document.getElementById("varName").value = "";
             document.getElementById("varInverted").checked = false;
+            refreshObjectives();
+            refreshConstraints();
             refreshVariables();
+            const myNode = document.getElementById("solutionValues");
+            clearElements(myNode);
         };
     });
 

@@ -30,8 +30,10 @@ class Problem:
 
     def set_variable(self, variable: Variable):
         must_update = variable in self._variables
+        must_switch = False
         if must_update:
-            self._variables.pop(variable)
+            old_var = self._variables.pop(variable)
+            must_switch = old_var.is_inverted != variable.is_inverted
 
         self._variables[variable] = variable
         if must_update:
@@ -40,6 +42,19 @@ class Problem:
             for constraint in self._constraints:
                 self._update_variable(constraint.left)
                 self._update_variable(constraint.right)
+
+        if must_switch:
+            for objective in self.objectives:
+                self._flip_terms(objective.expression, variable)
+
+            for constraint in self._constraints:
+                self._flip_terms(constraint.left, variable)
+                self._flip_terms(constraint.right, variable)
+
+    def _flip_terms(self, expression: Expression, variable: Variable):
+        for term in expression.terms:
+            if term.var == variable:
+                term.coef *= -1
 
     @property
     def objectives(self) -> List[Objective]:
