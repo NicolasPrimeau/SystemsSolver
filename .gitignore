@@ -4,5 +4,4 @@ __pycache__
 *.pyc
 dist
 build
-build_executable
 SystemsSolver.egg-info/

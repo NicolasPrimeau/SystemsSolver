@@ -46,3 +46,11 @@ class ExpressionParserTest(unittest.TestCase):
         expression = parser.parse("-5")
         self.assertEqual(1, len(expression.terms))
         self.assertEqual(Term(coef=-5), expression.terms[0])
+
+    def test_close(self):
+        parser = ExpressionParser()
+        expression = parser.parse("3x-y+5")
+        self.assertEqual(3, len(expression.terms))
+        self.assertEqual(Term(coef=3, var=Variable(name='x')), expression.terms[0])
+        self.assertEqual(Term(coef=-1, var=Variable(name='y')), expression.terms[1])
+        self.assertEqual(Term(coef=5), expression.terms[2])

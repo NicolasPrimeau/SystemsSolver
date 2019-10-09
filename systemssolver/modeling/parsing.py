@@ -63,6 +63,11 @@ class ExpressionParser:
                     terms.append(term)
                     si = var = co = None
             elif char == '+' or char == '-':
+                if co is not None or var is not None:
+                    term = get_var(si, co, var)
+                    if term:
+                        terms.append(term)
+                        var = co = None
                 si = char
             elif char.isalpha():
                 var = char

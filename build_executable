@@ -1,0 +1,3 @@
+pyinstaller -y --onefile app.spec
+cp dist/app ./bin/app.bin
+chmod +x ./bin/app.bin
