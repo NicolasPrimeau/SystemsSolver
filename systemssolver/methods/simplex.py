@@ -70,10 +70,11 @@ class Tableau:
         smallest_rh = None
         for idx, row in enumerate(self._tableau[:-1]):
             pivot_col_val = row[pivot_col]
-            rh_indicator = row[-1] / pivot_col_val
-            if smallest_idx is None or rh_indicator < smallest_rh:
-                smallest_idx = idx
-                smallest_rh = rh_indicator
+            if pivot_col_val != 0:
+                rh_indicator = row[-1] / pivot_col_val
+                if smallest_idx is None or smallest_rh > rh_indicator > 0:
+                    smallest_idx = idx
+                    smallest_rh = rh_indicator
         return smallest_idx
 
     def _identify_pivot_col(self) -> int:
@@ -86,7 +87,7 @@ class Tableau:
                 logging.error(
                     "All constraints must be formulated as {} with a slack variable".format(EqualitySigns.EQUAL.value))
                 raise RuntimeError
-            
+
             if len(constraint.right.terms) != 1:
                 logging.error("All constraints must have a one constant on right hand side")
                 raise RuntimeError()
@@ -144,7 +145,6 @@ class SimplexSolver(SolverMethod):
         # Standard form,
         # (1) must be a maximization problem,
         min_objective = convert_objective_to_goal(objective, ObjectiveGoal.MAXIMIZE)
-        must_negate_final_obj = min_objective.expression != objective.expression
 
         # (2) all linear constraints must be in a less-than-or-equal-to inequality,
         constraints = problem.constraints
@@ -162,12 +162,17 @@ class SimplexSolver(SolverMethod):
 
         # Creating the tableau
         tableau = Tableau(objective=min_objective.expression, constraints=slacked_constraints)
+        prev_solution = None
+        last_solution = None
         while not tableau.step():
-            if tracing_hook:
-                solution = tableau.to_solution()
-                if tracing_hook.step(solution):
-                    return solution
-
+            solution = tableau.to_solution()
+            if tracing_hook and not tracing_hook.step(solution):
+                return solution
+            if solution == prev_solution or solution == last_solution:
+                logging.warning('Loop detected')
+                return solution
+            prev_solution = last_solution
+            last_solution = solution
         return tableau.to_solution()
 
     def can_solve(self, problem: Problem) -> bool:

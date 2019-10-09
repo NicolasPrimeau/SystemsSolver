@@ -1,5 +1,34 @@
-from systemssolver.modeling.equation import Expression
+from systemssolver.modeling.equation import Expression, Constraint, EqualitySigns
 from systemssolver.modeling.variables import Term, Variable, Constant
+
+
+class ConstraintParser:
+
+    def parse(self, encoded: str) -> Constraint:
+        left_buffer = list()
+        right_buffer = list()
+
+        cur_buffer = left_buffer
+        sign = None
+        check_next = False
+        for char in encoded:
+            if not check_next and char in {'=', '<', '>', '!'}:
+                sign = char
+                cur_buffer = right_buffer
+            elif check_next and char == '=':
+                sign = sign + char
+            else:
+                cur_buffer.append(char)
+
+        if not right_buffer or not left_buffer:
+            raise RuntimeError()
+
+        parser = ExpressionParser()
+        return Constraint(
+            left=parser.parse(''.join(left_buffer)),
+            sign=EqualitySigns.from_val(sign),
+            right=parser.parse(''.join(right_buffer))
+        )
 
 
 class ExpressionParser:
@@ -25,6 +54,7 @@ class ExpressionParser:
             elif var_name is not None:
                 return Term(var=Variable(name=var_name))
             return None
+
         terms = list()
         for char in encoded:
             if char == ' ':

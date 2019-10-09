@@ -11,3 +11,4 @@ class PrintSolutionHook(TracingHook):
 
     def step(self, solution: Solution):
         print(str(solution))
+        return True

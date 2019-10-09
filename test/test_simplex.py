@@ -36,9 +36,38 @@ class SimplexTest(unittest.TestCase):
         solution = solver.solve(problem, tracing_hook=PrintSolutionHook())
 
         expected_vals = {x1.name: 8, x2.name: 0, x3.name: 0, 's0': 2, 's1': 0, 'z': 64}
-
+        print(solution)
         for var in solution.variables:
             self.assertEqual(expected_vals.get(var.name), var.val)
+
+    def test_assignment2(self):
+        a = Variable(name="a")
+        b = Variable(name="b")
+        c = Variable(name="c")
+
+        problem = Problem()
+        problem.add_objective(Objective(
+            expression=Expression(terms=[Term(coef=-5, var=a), Term(coef=-2, var=b), Term(coef=-30, var=c)]),
+            goal=ObjectiveGoal.MINIMIZE
+        ))
+
+        problem.add_constraint(Constraint(
+            left=Expression(terms=[Term(coef=1, var=a), Term(coef=9, var=b), Term(coef=12, var=c)]),
+            right=Expression(terms=[Term(var=Constant(name="c0", val=180))]),
+            sign=EqualitySigns.LE
+        ))
+
+        problem.add_constraint(Constraint(
+            left=Expression(terms=[Term(coef=2, var=a), Term(coef=9, var=b), Term(coef=6, var=c)]),
+            right=Expression(terms=[Term(var=Constant(name="c1", val=210))]),
+            sign=EqualitySigns.LE
+        ))
+        solver = SimplexSolver()
+        solution = solver.solve(problem, tracing_hook=PrintSolutionHook())
+        expected_vals = {a.name: 80, b.name: 0, c.name: 8.33333, 's0': 0, 's1': 0, 'z': 650}
+        print(solution)
+        for var in solution.variables:
+            self.assertAlmostEqual(expected_vals.get(var.name), var.val, 5)
 
     def test_simplex_project1(self):
         x = Variable(name="x")
@@ -65,8 +94,35 @@ class SimplexTest(unittest.TestCase):
         solver = SimplexSolver()
         solution = solver.solve(problem, tracing_hook=PrintSolutionHook())
 
-        expected_vals = {x.name: 8, y.name: 0, 's0': 2, 's1': 0, 'z': 64}
-        print(str(solution))
-
+        expected_vals = {x.name: 0, y.name: -26, 's0': 0, 's1': 42, 'z': 31.2}
+        print(solution)
         for var in solution.variables:
             self.assertEqual(expected_vals.get(var.name), var.val)
+
+    def test_question_2(self):
+        a = Variable(name="a")
+        b = Variable(name="b")
+
+        problem = Problem()
+        problem.add_objective(Objective(
+            expression=Expression(terms=[Term(coef=5, var=a), Term(coef=8, var=b)]),
+            goal=ObjectiveGoal.MAXIMIZE
+        ))
+
+        problem.add_constraint(Constraint(
+            left=Expression(terms=[Term(coef=10, var=a), Term(coef=7, var=b)]),
+            right=Expression(terms=[Term(var=Constant(name="c0", val=57))]),
+            sign=EqualitySigns.LE
+        ))
+
+        problem.add_constraint(Constraint(
+            left=Expression(terms=[Term(coef=5, var=a), Term(coef=9, var=b)]),
+            right=Expression(terms=[Term(var=Constant(name="c1", val=46))]),
+            sign=EqualitySigns.LE
+        ))
+        solver = SimplexSolver()
+        solution = solver.solve(problem, tracing_hook=PrintSolutionHook())
+        expected_vals = {a.name: 3.472727, b.name: 3.1818181, 's0': 0, 's1': 0, 'z': 42.81818181}
+        print(solution)
+        for var in solution.variables:
+            self.assertAlmostEqual(expected_vals.get(var.name), var.val, 5)
