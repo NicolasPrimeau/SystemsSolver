@@ -119,7 +119,8 @@ class Tableau:
 
         for constraint in self._constraints:
             for term in constraint.left.terms:
-                variables.add(term.var)
+                if term.var is not None:
+                    variables.add(term.var)
 
         obj_var = Variable(name="z")
         i = 0
@@ -150,8 +151,16 @@ class SimplexSolver(SolverMethod):
         min_objective = convert_objective_to_goal(objective, ObjectiveGoal.MAXIMIZE)
 
         # (2) all linear constraints must be in a less-than-or-equal-to inequality,
-        constraints = problem.constraints
-        lte_constraints = [convert_constraint_to(constraint, EqualitySigns.LE) for constraint in constraints]
+        lte_constraints = [convert_constraint_to(constraint, EqualitySigns.LE) for constraint in problem.constraints]
+        for constraint in lte_constraints:
+            lh_constants = [term for term in constraint.left.terms if term.var is None]
+            rh_vars = [term for term in constraint.right.terms if term.var is not None]
+            for term in lh_constants:
+                constraint.left -= term
+                constraint.right += term
+            for var in rh_vars:
+                constraint.left += var
+                constraint.right -= var
 
         # (3) all variables are non-negative.
 

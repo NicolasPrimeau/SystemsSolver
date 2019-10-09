@@ -69,6 +69,34 @@ class SimplexTest(unittest.TestCase):
         for var in solution.variables:
             self.assertAlmostEqual(expected_vals.get(var.name), var.val, 5)
 
+    def test_unstandard_form(self):
+        x = Variable(name="x")
+        y = Variable(name="y")
+        problem = Problem()
+        problem.add_objective(Objective(
+            expression=Expression(terms=[Term(coef=1, var=x), Term(coef=1.2, var=y)]),
+            goal=ObjectiveGoal.MAXIMIZE
+        ))
+
+        problem.add_constraint(Constraint(
+            left=Expression(terms=[Term(coef=2, var=x), Term(coef=1, var=y), Term(coef=1)]),
+            right=Expression(terms=[Term(coef=sum([6, 3, 5, 2, 1, 4, 5]))]),
+            sign=EqualitySigns.GE
+        ))
+
+        problem.add_constraint(Constraint(
+            left=Expression(terms=[Term(coef=1, var=x), Term(coef=3, var=y)]),
+            right=Expression(terms=[Term(coef=120)]),
+            sign=EqualitySigns.LE)
+        )
+        solver = SimplexSolver()
+        solution = solver.solve(problem, tracing_hook=PrintSolutionHook())
+
+        expected_vals = {x.name: 0, y.name: 0, 's0': -27, 's1': 120, 'z': 0}
+        print(solution)
+        for var in solution.variables:
+            self.assertEqual(expected_vals.get(var.name), var.val)
+
     def test_simplex_project1(self):
         x = Variable(name="x")
         y = Variable(name="y", inverted=True)

@@ -51,7 +51,11 @@ class Expression:
 
     def var_coef_view(self) -> Dict:
         self.simplify()
-        return {term.var: term.coef for term in self.terms}
+        var_coefs = dict()
+        for term in self.terms:
+            search_key = term.var if term.var is not None else 'constant'
+            var_coefs[search_key] = term.coef
+        return var_coefs
 
     def evaluate(self):
         total = 0
@@ -68,9 +72,10 @@ class Expression:
     def simplify(self):
         terms = dict()
         for term in self.terms:
-            if term.var not in terms:
-                terms[term.var] = 0
-            terms[term.var] += term.coef
+            search_key = term.var if term.var is not None else 'constant'
+            if search_key not in terms:
+                terms[search_key] = 0
+            terms[search_key] += term.coef
         self._terms = [Term(var=var, coef=coef) for var, coef in terms.items()]
 
     def copy(self):
@@ -103,10 +108,24 @@ class Expression:
 
     def __add__(self, other):
         if isinstance(other, Term):
-            terms = [term.copy() for term in self.terms]
-            terms.append(other)
-            exp = Expression(terms)
-            exp.simplify()
+            exp = self.copy()
+            var_coefs = exp.var_coef_view()
+            search_key = other.var if other.var is not None else 'constant'
+
+            if search_key not in var_coefs:
+                var_coefs[search_key] = other.coef
+            else:
+                var_coefs[search_key] += other.coef
+            if var_coefs[search_key] == 0:
+                var_coefs.pop(search_key)
+
+            terms = list()
+            for var, coef in var_coefs.items():
+                if var != 'constant':
+                    terms.append(Term(coef=coef, var=var))
+                else:
+                    terms.append(Term(coef=coef))
+            exp._terms = terms
             return exp
         elif isinstance(other, Expression):
             terms = [term.copy() for term in self.terms]
@@ -121,11 +140,23 @@ class Expression:
             exp = self.copy()
             var_coefs = exp.var_coef_view()
 
-            if other.var not in var_coefs:
-                var_coefs[other.var] = -other.coef
+            search_key = other.var if other.var is not None else 'constant'
+
+            if search_key not in var_coefs:
+                var_coefs[search_key] = -other.coef
             else:
-                var_coefs[other.var] -= other.coef
-            exp._terms = [Term(var=var, coef=coef) for var, coef in var_coefs.items()]
+                var_coefs[search_key] -= other.coef
+
+            if var_coefs[search_key] == 0:
+                var_coefs.pop(search_key)
+
+            terms = list()
+            for var, coef in var_coefs.items():
+                if var != 'constant':
+                    terms.append(Term(coef=coef, var=var))
+                else:
+                    terms.append(Term(coef=coef))
+            exp._terms = terms
             return exp
         elif isinstance(other, Expression):
             exp = self.copy()
