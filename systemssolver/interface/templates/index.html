@@ -7,72 +7,77 @@
 </head>
 
 <body>
-<div class="full-height center">
-    <h1>Systems Solver</h1>
-    <div>
-        <form>
-            <input type="button" value="Reset" id="reset">
-        </form>
-    </div>
-    <div>
-        <div>
-            <h2>Variables</h2>
-            <form>
-                Name:
-                <input id="varName" type="text">
-                Inverted:
-                <input type="checkbox" name="inverted" id="varInverted">
-                <input type="button" value="Set" id="setVariable">
-            </form>
-            <ul id="currentVariables"></ul>
+    <div class="full-height center">
+        <div id="header">
+            <h1>Systems Solver</h1>
         </div>
-        <div>
-            <h2>Objectives</h2>
-            <form>
-                <select id="objectiveGoal">
-                    <option value="maximize" selected="selected">Maximize</option>
-                    <option value="minimize">Minimize</option>
-                </select>
-                <input id="objectiveExpression" type="text">
-                <input type="button" value="Add" id="addObjective">
-            </form>
-            <ul id="currentObjectives"></ul>
-        </div>
-        <div>
-            <h2>Constraints</h2>
-            <form>
-                <input type="text" id="constraintLeft">
-                <select id="constraintSign">
-                    <option value="=" selected="selected">=</option>
-                    <option value="<"><</option>
-                    <option value="<="><=</option>
-                    <option value=">">></option>
-                    <option value=">=">>=</option>
-                    <option value="!=">!=</option>
-                </select>
-                <input type="text" id="constraintRight">
-                <input type="button" value="Add" id="addConstraint">
-            </form>
-            <ul id="currentConstraints"></ul>
-        </div>
-        <div>
-            <h2>Solution</h2>
-            <form>
-                Method:
-                <select id="solverMethod">
-                    <option value="simplex" selected="selected">Simplex</option>
-                </select>
-                <!--  Debug:
-                <input type="checkbox" name="debug" id="solverDebug"> -->
-                <input type="button" value="Solve!" id="solve">
-            </form>
-            <div id="solutionSpace">
-                <ul id="solutionValues">
+        <div id="full-container">
+            <div>
+                <form>
+                    <input type="button" value="Reset" id="reset">
+                    <input type="button" value="Quit" id="quit">
+                </form>
+            </div>
+            <div>
+                <div>
+                    <h2>Variables</h2>
+                    <form>
+                        Name:
+                        <input id="varName" type="text">
+                        Inverted:
+                        <input type="checkbox" name="inverted" id="varInverted">
+                        <input type="button" value="Set" id="setVariable">
+                    </form>
+                    <ul id="currentVariables"></ul>
+                </div>
+                <div>
+                    <h2>Objectives</h2>
+                    <form>
+                        <select id="objectiveGoal">
+                            <option value="maximize" selected="selected">Maximize</option>
+                            <option value="minimize">Minimize</option>
+                        </select>
+                        <input id="objectiveExpression" type="text">
+                        <input type="button" value="Add" id="addObjective">
+                    </form>
+                    <ul id="currentObjectives"></ul>
+                </div>
+                <div>
+                    <h2>Constraints</h2>
+                    <form>
+                        <input type="text" id="constraintLeft">
+                        <select id="constraintSign">
+                            <option value="=" selected="selected">=</option>
+                            <option value="<"><</option>
+                            <option value="<="><=</option>
+                            <option value=">">></option>
+                            <option value=">=">>=</option>
+                            <option value="!=">!=</option>
+                        </select>
+                        <input type="text" id="constraintRight">
+                        <input type="button" value="Add" id="addConstraint">
+                    </form>
+                    <ul id="currentConstraints"></ul>
+                </div>
+                <div>
+                    <h2>Solution</h2>
+                    <form>
+                        Method:
+                        <select id="solverMethod">
+                            <option value="simplex" selected="selected">Simplex</option>
+                        </select>
+                        <!--  Debug:
+                        <input type="checkbox" name="debug" id="solverDebug"> -->
+                        <input type="button" value="Solve!" id="solve">
+                    </form>
+                    <div id="solutionSpace">
+                        <ul id="solutionValues">
 
-                </ul>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
 </body>
 </html>

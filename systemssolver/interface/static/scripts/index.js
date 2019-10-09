@@ -65,6 +65,25 @@ document.addEventListener("DOMContentLoaded", function(){
         vRequest.send();
     }
 
+    let quitButton = document.getElementById("quit");
+    quitButton.addEventListener('click', (event) => {
+        event.preventDefault();
+        quitRequest = new XMLHttpRequest();
+        quitRequest.open("POST", "/api/shutdown")
+        quitRequest.send()
+        const myNode = document.getElementById("full-container");
+        clearElements(myNode);
+        var headerElement = document.createElement("h2");
+        var textNode = document.createTextNode("Good bye!");
+        headerElement.appendChild(textNode);
+        myNode.appendChild(headerElement);
+
+        var quitElement = document.createElement("h4");
+        textNode = document.createTextNode("(You should close this tab)");
+        quitElement.appendChild(textNode);
+        myNode.appendChild(quitElement);
+    });
+
     let resetButton = document.getElementById("reset");
     resetButton.addEventListener('click', (event) => {
         event.preventDefault();

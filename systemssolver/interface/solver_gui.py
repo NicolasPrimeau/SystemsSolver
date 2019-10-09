@@ -29,6 +29,7 @@ class FlaskApp:
         self.parser = ExpressionParser()
         self.app.add_url_rule("/", "/", self.index)
 
+        self.app.add_url_rule("/api/shutdown", "/api/shutdown", self.stop, methods=['POST'])
         self.app.add_url_rule("/api/variables", "/api/variables", self.list_variables, methods=['GET'])
         self.app.add_url_rule("/api/variables/set", "/api/variables/set", self.set_variable, methods=['POST'])
 
@@ -45,6 +46,13 @@ class FlaskApp:
 
     def index(self):
         return render_template("index.html")
+
+    def stop(self):
+        func = request.environ.get('werkzeug.server.shutdown')
+        if func is None:
+            raise RuntimeError('Not running with the Werkzeug Server')
+        func()
+        return Response("Ok", HTTPStatus.OK, content_type="text/plain")
 
     def reset(self):
         self.problem = Problem()
