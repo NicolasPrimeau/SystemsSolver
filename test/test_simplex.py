@@ -74,7 +74,7 @@ class SimplexTest(unittest.TestCase):
         y = Variable(name="y")
         problem = Problem()
         problem.add_objective(Objective(
-            expression=Expression(terms=[Term(coef=1, var=x), Term(coef=1.2, var=y)]),
+            expression=Expression(terms=[Term(coef=1, var=x), Term(coef=1.2, var=y), Term(coef=5)]),
             goal=ObjectiveGoal.MAXIMIZE
         ))
 
@@ -92,7 +92,7 @@ class SimplexTest(unittest.TestCase):
         solver = SimplexSolver()
         solution = solver.solve(problem, tracing_hook=PrintSolutionHook())
 
-        expected_vals = {x.name: 0, y.name: 0, 's0': -27, 's1': 120, 'z': 0}
+        expected_vals = {x.name: 0, y.name: 0, 's0': -27, 's1': 120, 'z': 5.0}
         print(solution)
         for var in solution.variables:
             self.assertEqual(expected_vals.get(var.name), var.val)

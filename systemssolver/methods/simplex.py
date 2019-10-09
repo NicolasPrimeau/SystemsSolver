@@ -105,17 +105,25 @@ class Tableau:
             tableau[row_idx][-1] = constraint.right.terms[0].coef
 
         for term in self._objective.terms:
-            var_idx = self._variables.index(term.var)
-            tableau[-1][var_idx] = -term.coef
+            if term.var is not None:
+                var_idx = self._variables.index(term.var)
+                tableau[-1][var_idx] = -term.coef
 
         tableau[-1][self._variables.index(self._optimization_var)] = 1
+
+        val = 0
+        for term in self._objective.terms:
+            if term.var is None:
+                val += term.coef
+        tableau[-1][-1] = val
         return tableau
 
     def _get_variables(self) -> List[Variable]:
         variables = set()
 
         for term in self._objective.terms:
-            variables.add(term.var)
+            if term.var is not None:
+                variables.add(term.var)
 
         for constraint in self._constraints:
             for term in constraint.left.terms:
