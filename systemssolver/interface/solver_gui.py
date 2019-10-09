@@ -9,6 +9,7 @@ from systemssolver.methods.factory import SolverMethods
 from systemssolver.modeling.equation import EqualitySigns, Constraint
 from systemssolver.modeling.objective import ObjectiveGoal, Objective
 from systemssolver.modeling.parsing import ExpressionParser
+from systemssolver.modeling.variables import Variable
 from systemssolver.problem import Problem
 
 
@@ -29,6 +30,7 @@ class FlaskApp:
         self.app.add_url_rule("/", "/", self.index)
 
         self.app.add_url_rule("/api/variables", "/api/variables", self.list_variables, methods=['GET'])
+        self.app.add_url_rule("/api/variables/set", "/api/variables/set", self.set_variable, methods=['POST'])
 
         self.app.add_url_rule("/api/objective", "/api/objective", self.list_objectives, methods=['GET'])
         self.app.add_url_rule("/api/objective/add", "/api/objective/add", self.add_objective, methods=['POST'])
@@ -49,19 +51,19 @@ class FlaskApp:
         return Response("Ok", HTTPStatus.OK, content_type="text/plain")
 
     def list_variables(self):
-        variables = set()
-        for objective in self.problem.objectives:
-            variables |= {term.var for term in objective.expression.terms if term.var is not None}
-
-        for objective in self.problem.constraints:
-            variables |= {term.var for term in objective.left.terms if term.var is not None}
-            variables |= {term.var for term in objective.right.terms if term.var is not None}
         return Response(json.dumps({
             'variables': [
                 {'name': var.name, 'isInverted': var.is_inverted, 'type': str(var.var_type.value)}
-                for var in variables
+                for var in self.problem.variables
             ]}),
             HTTPStatus.OK, content_type="application/json;charset=utf-8")
+
+    def set_variable(self):
+        data = request.json
+        var_name = data['name']
+        is_inverted = data['inverted']
+        self.problem.set_variable(Variable(name=var_name, inverted=is_inverted))
+        return Response('Ok', HTTPStatus.OK, content_type="text/plain")
 
     def list_objectives(self):
         return Response(json.dumps({

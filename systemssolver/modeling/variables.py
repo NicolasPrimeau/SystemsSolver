@@ -56,6 +56,10 @@ class Term:
     def var(self):
         return self._var
 
+    @var.setter
+    def var(self, new_val: Variable):
+        self._var = new_val
+
     def evaluate(self):
         if self.var is None:
             return self.coef

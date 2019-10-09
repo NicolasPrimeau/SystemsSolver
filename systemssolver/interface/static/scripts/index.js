@@ -1,14 +1,19 @@
 
 document.addEventListener("DOMContentLoaded", function(){
+
+    function clearElements(myNode)
+    {
+        while (myNode.firstChild) {
+            myNode.removeChild(myNode.firstChild);
+        }
+    }
     function refreshObjectives()
     {
         request = new XMLHttpRequest();
         request.open("GET", "/api/objective")
         request.onload = function() {
             const myNode = document.getElementById("currentObjectives");
-            while (myNode.firstChild) {
-                myNode.removeChild(myNode.firstChild);
-            }
+            clearElements(myNode);
             const objectives = JSON.parse(request.responseText);
             for (objective of objectives.objectives)
             {
@@ -27,9 +32,7 @@ document.addEventListener("DOMContentLoaded", function(){
         cRequest.open("GET", "/api/constraint")
         cRequest.onload = function() {
             const myNode = document.getElementById("currentConstraints");
-            while (myNode.firstChild) {
-                myNode.removeChild(myNode.firstChild);
-            }
+            clearElements(myNode);
             const constraints = JSON.parse(cRequest.responseText);
             for (constraint of constraints.constraints)
             {
@@ -48,15 +51,13 @@ document.addEventListener("DOMContentLoaded", function(){
         vRequest.open("GET", "/api/variables")
         vRequest.onload = function() {
             const myNode = document.getElementById("currentVariables");
-            while (myNode.firstChild) {
-                myNode.removeChild(myNode.firstChild);
-            }
+            clearElements(myNode);
             const variables = JSON.parse(vRequest.responseText);
             for (variable of variables.variables)
             {
                 var listElement = document.createElement("LI");
                 var textNode = document.createTextNode(
-                variable.name + ", type=" + variable.type + ", inverted=" + variable.isInverted);
+                    variable.name + ", type=" + variable.type + ", inverted=" + variable.isInverted);
                 listElement.appendChild(textNode);
                 myNode.appendChild(listElement);
             }
@@ -77,6 +78,8 @@ document.addEventListener("DOMContentLoaded", function(){
             refreshObjectives();
             refreshConstraints();
             refreshVariables();
+            const myNode = document.getElementById("solutionValues");
+            clearElements(myNode);
         };
     });
 
@@ -115,21 +118,36 @@ document.addEventListener("DOMContentLoaded", function(){
         };
     });
 
+    let setVariableButton = document.getElementById("setVariable");
+    setVariableButton.addEventListener('click', (event) => {
+        event.preventDefault();
+        var varName = document.getElementById("varName").value;
+        var isInverted = document.getElementById("varInverted").checked;
+
+        consRequest = new XMLHttpRequest();
+        consRequest.open("POST", "/api/variables/set")
+        consRequest.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        consRequest.send(JSON.stringify({'name': varName, 'inverted': isInverted}))
+        consRequest.onload = function() {
+            document.getElementById("varName").value = "";
+            document.getElementById("varInverted").checked = false;
+            refreshVariables();
+        };
+    });
 
     let solveButton = document.getElementById("solve");
     solveButton.addEventListener('click', (event) => {
         event.preventDefault();
         var method = document.getElementById("solverMethod").value;
-        var debug = document.getElementById("solverDebug").value;
+        // var debug = document.getElementById("solverDebug").checked;
+         var debug = false;
         solveRequest = new XMLHttpRequest();
         solveRequest.open("POST", "/api/solve")
         solveRequest.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
         solveRequest.send(JSON.stringify({"method": method, "debug": debug}))
         solveRequest.onload = function() {
             const myNode = document.getElementById("solutionValues");
-            while (myNode.firstChild) {
-                myNode.removeChild(myNode.firstChild);
-            }
+            clearElements(myNode);
             const solution = JSON.parse(solveRequest.responseText);
             for (var key in solution.vars)
             {

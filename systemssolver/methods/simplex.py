@@ -125,8 +125,6 @@ class Tableau:
             i += 1
         self._optimization_var = obj_var
         variables.add(obj_var)
-        print(variables)
-        print([var.name for var in variables])
         return list(sorted(variables, key=lambda var: var.name))
 
     def __str__(self):
