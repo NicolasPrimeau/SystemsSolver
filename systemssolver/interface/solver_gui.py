@@ -1,4 +1,6 @@
 import json
+import os
+import sys
 from http import HTTPStatus
 
 from flask import Flask, render_template, Response, request
@@ -13,7 +15,12 @@ from systemssolver.problem import Problem
 class FlaskApp:
 
     def __init__(self, host='0.0.0.0', port=50000):
-        self.app = Flask(__name__)
+        if getattr(sys, 'frozen', False):
+            template_folder = os.path.join(sys._MEIPASS, 'templates')
+            static_folder = os.path.join(sys._MEIPASS, 'static')
+            self.app = Flask(__name__, template_folder=template_folder, static_folder=static_folder)
+        else:
+            self.app = Flask(__name__)
         self.app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
         self.app.config['TEMPLATES_AUTO_RELOAD'] = True
         self.host, self.port = host, port

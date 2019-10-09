@@ -1,0 +1,3 @@
+graft systemssolver/interface/static
+graft systemssolver/interface/templates
+global-exclude *.pyc
