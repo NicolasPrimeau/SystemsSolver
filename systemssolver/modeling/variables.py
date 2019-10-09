@@ -19,6 +19,14 @@ class Variable:
     def val(self):
         return self._val if not self._inverted else -self._val
 
+    @property
+    def is_inverted(self):
+        return self._inverted
+
+    @property
+    def var_type(self):
+        return self._type
+
     @val.setter
     def val(self, new_val):
         self._val = new_val
@@ -33,34 +41,24 @@ class Variable:
         return self.name
 
 
-class Constant(Variable):
-
-    def __init__(self, name, val):
-        super().__init__(name, val)
-
-    @property
-    def val(self):
-        return self._val
-
-    @val.setter
-    def val(self, new_val):
-        raise RuntimeError()
-
-    @property
-    def name(self):
-        return self.val
-
-    def __str__(self):
-        return str(self.val) if self.val >= 0 else '-{}'.format(self.val)
-
-
 class Term:
 
-    def __init__(self, var: Variable, coef=1):
-        self.var: Variable = var
-        self.coef = coef
+    def __init__(self, var: Variable = None, coef=None):
+        self._var: Variable = var
+        if var is None and coef is None:
+            self.coef = 0
+        elif var is not None and coef is None:
+            self.coef = 1
+        else:
+            self.coef = coef
+
+    @property
+    def var(self):
+        return self._var
 
     def evaluate(self):
+        if self.var is None:
+            return self.coef
         if not self.var.val:
             return None
         return self.var.val * self.coef
@@ -78,6 +76,8 @@ class Term:
         return Term(var=self.var, coef=-self.coef)
 
     def __str__(self):
+        if self.var is None:
+            return str(self.coef)
         if self.coef != 1:
             return str(self.var)
         else:

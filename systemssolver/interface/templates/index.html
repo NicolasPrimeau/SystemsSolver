@@ -7,7 +7,7 @@
 </head>
 
 <body>
-<div class="full-height">
+<div class="full-height center">
     <h1>Systems Solver</h1>
     <div>
         <form>
@@ -15,20 +15,20 @@
         </form>
     </div>
     <div>
-        <h2>Add an objective</h2>
+        <div>
+        <h2>Objectives</h2>
         <form>
-            Expression:
-            <input id="objectiveExpression" type="text">
-            Goal
             <select id="objectiveGoal">
                 <option value="maximize" selected="selected">Maximize</option>
                 <option value="minimize">Minimize</option>
             </select>
+            <input id="objectiveExpression" type="text">
             <input type="button" value="Add" id="addObjective">
         </form>
+        <ul id="currentObjectives"></ul>
     </div>
     <div>
-        <h2>Add a constraint</h2>
+        <h2>Constraints</h2>
         <form>
             <input type="text" id="constraintLeft">
             <select id="constraintSign">
@@ -42,23 +42,11 @@
             <input type="text" id="constraintRight">
             <input type="button" value="Add" id="addConstraint">
         </form>
+        <ul id="currentConstraints"></ul>
     </div>
     <div>
-        <h2>Current System</h2>
-        <div>
-            <h3>
-                Current Objectives
-            </h3>
-            <ul id="currentObjectives">
-
-            </ul>
-        </div>
-        <div>
-            <h3>
-                Current Constraints
-            </h3>
-            <ul id="currentConstraints"></ul>
-        </div>
+        <h2>Variables</h2>
+        <ul id="currentVariables"></ul>
     </div>
     <div>
         <h2>Solve</h2>

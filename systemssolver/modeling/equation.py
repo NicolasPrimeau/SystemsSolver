@@ -79,11 +79,23 @@ class Expression:
     def __str__(self):
         terms = list()
         for term in self.terms:
-            if term.coef >= 0:
-                terms.append("{}{}{}".format(
-                    "+ " if len(terms) > 0 else "", term.coef if term.coef != 1 else '', term.var.name))
-            else:
-                terms.append("- {}{}".format(abs(term.coef), term.var.name))
+            encoded = ""
+            if len(terms) > 0:
+                encoded += "+ " if term.coef > 0 else "- "
+            elif len(terms) == 0:
+                encoded += "" if term.coef > 0 else "- "
+
+            if term.coef != 0:
+                if term.var is not None:
+                    if term.coef != 1:
+                        encoded += str(abs(term.coef))
+                    encoded += str(term.var)
+                else:
+                    encoded += str(abs(term.coef))
+                terms.append(encoded)
+
+        if len(terms) == 0:
+            return '0'
         return ' '.join(terms)
 
     def __neg__(self):

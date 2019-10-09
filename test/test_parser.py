@@ -1,7 +1,7 @@
 import unittest
 
 from systemssolver.modeling.parsing import ExpressionParser
-from systemssolver.modeling.variables import Term, Variable, Constant
+from systemssolver.modeling.variables import Term, Variable
 
 
 class ExpressionParserTest(unittest.TestCase):
@@ -31,7 +31,7 @@ class ExpressionParserTest(unittest.TestCase):
         self.assertEqual(3, len(expression.terms))
         self.assertEqual(Term(coef=3, var=Variable(name='x')), expression.terms[0])
         self.assertEqual(Term(coef=-5, var=Variable(name='y')), expression.terms[1])
-        self.assertEqual(Term(var=Constant(name='constant2', val=5)), expression.terms[2])
+        self.assertEqual(Term(coef=5), expression.terms[2])
 
     def test_no_coef(self):
         parser = ExpressionParser()
@@ -39,10 +39,10 @@ class ExpressionParserTest(unittest.TestCase):
         self.assertEqual(3, len(expression.terms))
         self.assertEqual(Term(coef=3, var=Variable(name='x')), expression.terms[0])
         self.assertEqual(Term(coef=-1, var=Variable(name='y')), expression.terms[1])
-        self.assertEqual(Term(var=Constant(name='constant2', val=5)), expression.terms[2])
+        self.assertEqual(Term(coef=5), expression.terms[2])
 
     def test_starting_const(self):
         parser = ExpressionParser()
         expression = parser.parse("-5")
         self.assertEqual(1, len(expression.terms))
-        self.assertEqual(Term(coef=1, var=Variable(name='constant0', val=-5)), expression.terms[0])
+        self.assertEqual(Term(coef=-5), expression.terms[0])

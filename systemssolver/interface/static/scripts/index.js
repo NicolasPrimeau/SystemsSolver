@@ -42,6 +42,28 @@ document.addEventListener("DOMContentLoaded", function(){
         cRequest.send();
     }
 
+    function refreshVariables()
+    {
+        vRequest = new XMLHttpRequest();
+        vRequest.open("GET", "/api/variables")
+        vRequest.onload = function() {
+            const myNode = document.getElementById("currentVariables");
+            while (myNode.firstChild) {
+                myNode.removeChild(myNode.firstChild);
+            }
+            const variables = JSON.parse(vRequest.responseText);
+            for (variable of variables.variables)
+            {
+                var listElement = document.createElement("LI");
+                var textNode = document.createTextNode(
+                variable.name + ", type=" + variable.type + ", inverted=" + variable.isInverted);
+                listElement.appendChild(textNode);
+                myNode.appendChild(listElement);
+            }
+        };
+        vRequest.send();
+    }
+
     let resetButton = document.getElementById("reset");
     resetButton.addEventListener('click', (event) => {
         event.preventDefault();
@@ -54,6 +76,7 @@ document.addEventListener("DOMContentLoaded", function(){
             document.getElementById("constraintRight").value = "";
             refreshObjectives();
             refreshConstraints();
+            refreshVariables();
         };
     });
 
@@ -69,6 +92,7 @@ document.addEventListener("DOMContentLoaded", function(){
         oRequest.onload = function() {
             document.getElementById("objectiveExpression").value = "";
             refreshObjectives();
+            refreshVariables();
         };
     });
 
@@ -87,6 +111,7 @@ document.addEventListener("DOMContentLoaded", function(){
             document.getElementById("constraintLeft").value = "";
             document.getElementById("constraintRight").value = "";
             refreshConstraints();
+            refreshVariables();
         };
     });
 
@@ -117,4 +142,5 @@ document.addEventListener("DOMContentLoaded", function(){
     });
     refreshObjectives();
     refreshConstraints();
+    refreshVariables();
 })

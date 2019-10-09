@@ -1,7 +1,7 @@
 import unittest
 
 from systemssolver.modeling.equation import Expression, Constraint, EqualitySigns
-from systemssolver.modeling.variables import Variable, Constant, Term
+from systemssolver.modeling.variables import Variable, Term
 
 
 class EquationsTest(unittest.TestCase):
@@ -20,9 +20,8 @@ class EquationsTest(unittest.TestCase):
         expression.add_term(Term(var=Variable('b', 5), coef=-2))
         expression.add_term(Term(var=Variable('c', 4), coef=5))
 
-        constraint = Constraint(left=expression, right=Expression(terms=[
-            Term(var=Constant(name='constraint1', val=12))
-        ]), sign=EqualitySigns.LE)
+        constraint = Constraint(
+            left=expression, right=Expression(terms=[Term(coef=12)]), sign=EqualitySigns.LE)
 
         self.assertTrue(constraint.is_satisfied())
 
@@ -32,8 +31,7 @@ class EquationsTest(unittest.TestCase):
         expression.add_term(Term(var=Variable('b', 5), coef=-2))
         expression.add_term(Term(var=Variable('c', 4), coef=5))
 
-        constraint = Constraint(left=expression, right=Expression(terms=[
-            Term(var=Constant(name='constraint1', val=12))
-        ]), sign=EqualitySigns.LT)
+        constraint = Constraint(
+            left=expression, right=Expression(terms=[Term(coef=12)]), sign=EqualitySigns.LT)
 
         self.assertFalse(constraint.is_satisfied())

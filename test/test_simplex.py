@@ -3,7 +3,7 @@ import unittest
 from systemssolver.methods.simplex import SimplexSolver
 from systemssolver.modeling.equation import Expression, Constraint, EqualitySigns
 from systemssolver.modeling.objective import Objective, ObjectiveGoal
-from systemssolver.modeling.variables import Term, Variable, Constant
+from systemssolver.modeling.variables import Term, Variable
 from systemssolver.problem import Problem
 from systemssolver.tracing.hook import PrintSolutionHook
 
@@ -22,13 +22,13 @@ class SimplexTest(unittest.TestCase):
 
         problem.add_constraint(Constraint(
             left=Expression(terms=[Term(coef=1, var=x1), Term(coef=3, var=x2), Term(coef=2, var=x3)]),
-            right=Expression(terms=[Term(var=Constant(name="c1", val=10))]),
+            right=Expression(terms=[Term(coef=10)]),
             sign=EqualitySigns.LE
         ))
 
         problem.add_constraint(Constraint(
             left=Expression(terms=[Term(coef=1, var=x1), Term(coef=5, var=x2), Term(coef=1, var=x3)]),
-            right=Expression(terms=[Term(var=Constant(name="c2", val=8))]),
+            right=Expression(terms=[Term(coef=8)]),
             sign=EqualitySigns.LE
         ))
 
@@ -53,13 +53,13 @@ class SimplexTest(unittest.TestCase):
 
         problem.add_constraint(Constraint(
             left=Expression(terms=[Term(coef=1, var=a), Term(coef=9, var=b), Term(coef=12, var=c)]),
-            right=Expression(terms=[Term(var=Constant(name="c0", val=180))]),
+            right=Expression(terms=[Term(coef=180)]),
             sign=EqualitySigns.LE
         ))
 
         problem.add_constraint(Constraint(
             left=Expression(terms=[Term(coef=2, var=a), Term(coef=9, var=b), Term(coef=6, var=c)]),
-            right=Expression(terms=[Term(var=Constant(name="c1", val=210))]),
+            right=Expression(terms=[Term(coef=210)]),
             sign=EqualitySigns.LE
         ))
         solver = SimplexSolver()
@@ -81,13 +81,13 @@ class SimplexTest(unittest.TestCase):
 
         problem.add_constraint(Constraint(
             left=Expression(terms=[Term(coef=2, var=x), Term(coef=1, var=y)]),
-            right=Expression(terms=[Term(var=Constant(name="c0", val=sum([6, 3, 5, 2, 1, 4, 5])))]),
+            right=Expression(terms=[Term(coef=sum([6, 3, 5, 2, 1, 4, 5]))]),
             sign=EqualitySigns.LE
         ))
 
         problem.add_constraint(Constraint(
             left=Expression(terms=[Term(coef=1, var=x), Term(coef=3, var=y)]),
-            right=Expression(terms=[Term(var=Constant(name="c1", val=120))]),
+            right=Expression(terms=[Term(coef=120)]),
             sign=EqualitySigns.LE)
         )
 
@@ -111,13 +111,13 @@ class SimplexTest(unittest.TestCase):
 
         problem.add_constraint(Constraint(
             left=Expression(terms=[Term(coef=10, var=a), Term(coef=7, var=b)]),
-            right=Expression(terms=[Term(var=Constant(name="c0", val=57))]),
+            right=Expression(terms=[Term(coef=57)]),
             sign=EqualitySigns.LE
         ))
 
         problem.add_constraint(Constraint(
             left=Expression(terms=[Term(coef=5, var=a), Term(coef=9, var=b)]),
-            right=Expression(terms=[Term(var=Constant(name="c1", val=46))]),
+            right=Expression(terms=[Term(coef=46)]),
             sign=EqualitySigns.LE
         ))
         solver = SimplexSolver()

@@ -99,7 +99,7 @@ class Tableau:
             for term in constraint.left.terms:
                 var_idx = self._variables.index(term.var)
                 tableau[row_idx][var_idx] = term.coef
-            tableau[row_idx][-1] = constraint.right.terms[0].var.val
+            tableau[row_idx][-1] = constraint.right.terms[0].coef
 
         for term in self._objective.terms:
             var_idx = self._variables.index(term.var)
@@ -125,6 +125,8 @@ class Tableau:
             i += 1
         self._optimization_var = obj_var
         variables.add(obj_var)
+        print(variables)
+        print([var.name for var in variables])
         return list(sorted(variables, key=lambda var: var.name))
 
     def __str__(self):

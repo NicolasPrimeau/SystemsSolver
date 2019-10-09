@@ -1,5 +1,5 @@
 from systemssolver.modeling.equation import Expression, Constraint, EqualitySigns
-from systemssolver.modeling.variables import Term, Variable, Constant
+from systemssolver.modeling.variables import Term, Variable
 
 
 class ConstraintParser:
@@ -44,13 +44,13 @@ class ExpressionParser:
                 return Term(coef=val, var=Variable(var_name))
             elif sign is not None and coef is not None:
                 val = float('{}{}'.format(sign, coef))
-                return Term(var=Constant(name='constant{}'.format(str(len(terms))), val=val))
+                return Term(coef=val)
             elif coef is not None and var_name is not None:
                 return Term(coef=float(coef), var=Variable(var_name))
             elif sign is not None and var_name is not None:
                 return Term(var=Variable(name=var_name), coef=1 if sign == '+' else -1)
             elif coef is not None:
-                return Term(var=Constant(name='constant{}'.format(str(len(terms))), val=float(coef)))
+                return Term(coef=float(coef))
             elif var_name is not None:
                 return Term(var=Variable(name=var_name))
             return None
