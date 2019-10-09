@@ -175,7 +175,39 @@ class Constraint:
         return str(self.left) + " " + str(self.sign) + " " + str(self.right)
 
 
-def convert_constraint_to(constraint: Constraint, sign: EqualitySigns):
+def convert_constraint_to(constraint: Constraint, sign: EqualitySigns) -> Constraint:
     if constraint.sign == sign:
         return constraint
+
+    if sign == EqualitySigns.LE:
+        if constraint.sign == EqualitySigns.LT:
+            return Constraint(left=constraint.left, right=constraint.right, sign=EqualitySigns.LE)
+        elif constraint.sign == EqualitySigns.GE:
+            return Constraint(left=-constraint.left, right=-constraint.right, sign=EqualitySigns.LE)
+        elif constraint.sign == EqualitySigns.GT:
+            return Constraint(left=-constraint.left, right=-constraint.right, sign=EqualitySigns.LE)
+
+    if sign == EqualitySigns.LT:
+        if constraint.sign == EqualitySigns.LE:
+            return Constraint(left=constraint.left, right=constraint.right, sign=EqualitySigns.LT)
+        elif constraint.sign == EqualitySigns.GE:
+            return Constraint(left=-constraint.left, right=-constraint.right, sign=EqualitySigns.LT)
+        elif constraint.sign == EqualitySigns.GT:
+            return Constraint(left=-constraint.left, right=-constraint.right, sign=EqualitySigns.LT)
+
+    if sign == EqualitySigns.GE:
+        if constraint.sign == EqualitySigns.GT:
+            return Constraint(left=constraint.left, right=constraint.right, sign=EqualitySigns.GE)
+        elif constraint.sign == EqualitySigns.LE:
+            return Constraint(left=-constraint.left, right=-constraint.right, sign=EqualitySigns.GE)
+        elif constraint.sign == EqualitySigns.LT:
+            return Constraint(left=-constraint.left, right=-constraint.right, sign=EqualitySigns.GE)
+
+    if sign == EqualitySigns.GT:
+        if constraint.sign == EqualitySigns.GE:
+            return Constraint(left=constraint.left, right=constraint.right, sign=EqualitySigns.GT)
+        elif constraint.sign == EqualitySigns.LE:
+            return Constraint(left=-constraint.left, right=-constraint.right, sign=EqualitySigns.GT)
+        elif constraint.sign == EqualitySigns.LT:
+            return Constraint(left=-constraint.left, right=-constraint.right, sign=EqualitySigns.GT)
     raise NotImplementedError()

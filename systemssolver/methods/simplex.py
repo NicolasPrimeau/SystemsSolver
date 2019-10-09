@@ -25,17 +25,7 @@ class Tableau:
 
         pivot_col = self._identify_pivot_col()
         pivot_row = self._identify_pivot_row(pivot_col)
-
-        print(pivot_col)
-        print(self._variables[pivot_col])
-        print(pivot_row)
-        input()
-
         self._tableau = self._create_new_tableau(pivot_row, pivot_col)
-        print(' '.join(map(str, self._variables)))
-        for row in self._tableau:
-            print(row)
-        input()
         return self._check_optimal()
 
     def to_solution(self) -> Solution:
@@ -45,13 +35,15 @@ class Tableau:
             for row_idx, row in enumerate(self._tableau):
                 if row[var_idx] == 1 and optimal_row_idx is None:
                     optimal_row_idx = row_idx
-                elif row[var_idx] == 1:
+                elif row[var_idx] == 1 or row[var_idx] != 0:
                     optimal_row_idx = None
                     break
+
             if optimal_row_idx is None:
-                optimal_variables.add(Variable(name=var.name, val=0))
+                var.val = 0
             else:
-                optimal_variables.add(Variable(name=var.name, val=self._tableau[optimal_row_idx][-1]))
+                var.val = self._tableau[optimal_row_idx][-1]
+            optimal_variables.add(var)
         return Solution(optimal_variables)
 
     def _check_optimal(self) -> bool:
@@ -65,18 +57,12 @@ class Tableau:
         for col_idx, val in enumerate(self._tableau[pivot_row]):
             new_tableau[pivot_row][col_idx] /= pivot_var_val
 
-        print(' '.join(map(str, self._variables)))
-        for row in new_tableau:
-            print(row)
-        print()
+        pivot_var_val = new_tableau[pivot_row][pivot_col]
 
         for row_idx, row in filter(lambda i_r: i_r[0] != pivot_row, enumerate(new_tableau)):
             row_multiplier = row[pivot_col] / pivot_var_val
-            print(row_idx)
-            print(row)
-            print(row_multiplier)
             for col_idx, val in enumerate(row):
-                new_tableau[row_idx][col_idx] -= row_multiplier * self._tableau[row_idx][col_idx]
+                new_tableau[row_idx][col_idx] -= row_multiplier * new_tableau[pivot_row][col_idx]
         return new_tableau
 
     def _identify_pivot_row(self, pivot_col) -> int:
@@ -94,20 +80,13 @@ class Tableau:
         return min(range(0, len(self._tableau[-1]) - 1), key=lambda idx: self._tableau[-1][idx])
 
     def _check_valid(self):
-        for term in self._objective.terms:
-            if term.coef < 0:
-                logging.error("Coef can't be negative")
-                raise RuntimeError()
 
         for constraint in self._constraints:
             if constraint.sign != EqualitySigns.EQUAL:
                 logging.error(
                     "All constraints must be formulated as {} with a slack variable".format(EqualitySigns.EQUAL.value))
                 raise RuntimeError
-            for term in constraint.left.terms:
-                if term.coef < 0:
-                    logging.error("All coefficients can't be negative")
-                    raise RuntimeError()
+            
             if len(constraint.right.terms) != 1:
                 logging.error("All constraints must have a one constant on right hand side")
                 raise RuntimeError()
@@ -147,6 +126,12 @@ class Tableau:
         variables.add(obj_var)
         return list(sorted(variables, key=lambda var: var.name))
 
+    def __str__(self):
+        x = ' '.join(map(str, self._variables)) + '\n'
+        for row in self._tableau:
+            x += str(row) + '\n'
+        return x
+
 
 class SimplexSolver(SolverMethod):
 
@@ -159,13 +144,13 @@ class SimplexSolver(SolverMethod):
         # Standard form,
         # (1) must be a maximization problem,
         min_objective = convert_objective_to_goal(objective, ObjectiveGoal.MAXIMIZE)
+        must_negate_final_obj = min_objective.expression != objective.expression
 
         # (2) all linear constraints must be in a less-than-or-equal-to inequality,
         constraints = problem.constraints
         lte_constraints = [convert_constraint_to(constraint, EqualitySigns.LE) for constraint in constraints]
 
         # (3) all variables are non-negative.
-        # TODO: not sure how to do this.
 
         # Introducing slack variables: additional variables that make inequalities to
         # equal. The new system is called canonical form.

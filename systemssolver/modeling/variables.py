@@ -8,8 +8,8 @@ class VariableType(Enum):
 
 class Variable:
 
-    def __init__(self, name, val=None, vtype=VariableType.REAL):
-        self._val, self._name, self._type = val, name, vtype
+    def __init__(self, name, val=None, vtype=VariableType.REAL, inverted=False):
+        self._val, self._name, self._type, self._inverted = val, name, vtype, inverted
 
     @property
     def name(self):
@@ -17,7 +17,7 @@ class Variable:
 
     @property
     def val(self):
-        return self._val
+        return self._val if not self._inverted else -self._val
 
     @val.setter
     def val(self, new_val):
@@ -74,7 +74,7 @@ class Term:
         return Term(var=self.var, coef=-self.coef)
 
     def __str__(self):
-        if self.coef.val != 1:
+        if self.coef != 1:
             return str(self.var)
         else:
             return "{}*{}".format(str(self.coef), str(self.var))
