@@ -114,7 +114,11 @@ class FlaskApp:
         data = request.json
         solver = SolverMethods.from_val(data['method']).get_solver()
         debug = data['debug']
-        solution = solver.solve(self.problem)
+        try:
+            solution = solver.solve(self.problem)
+        except Exception:
+            return Response("Invalid System", HTTPStatus.BAD_REQUEST, content_type="text/plain")
+
         if not solution:
             return Response("Definied system is not suitable for this method.", HTTPStatus.BAD_REQUEST,
                             content_type="text/plain")

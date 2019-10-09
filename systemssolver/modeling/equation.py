@@ -92,8 +92,8 @@ class Expression:
 
             if term.coef != 0:
                 if term.var is not None:
-                    if term.coef != 1:
-                        encoded += str(abs(term.coef))
+                    if abs(term.coef) != 1:
+                        encoded += str(abs(float(term.coef)))
                     encoded += str(term.var)
                 else:
                     encoded += str(abs(term.coef))

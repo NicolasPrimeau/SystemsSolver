@@ -82,7 +82,8 @@ class Term:
     def __str__(self):
         if self.var is None:
             return str(self.coef)
-        if self.coef != 1:
+
+        if self.coef == 1:
             return str(self.var)
         else:
             return "{}*{}".format(str(self.coef), str(self.var))
