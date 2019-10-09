@@ -36,8 +36,8 @@ class ExpressionParser:
                 si = char
             elif char.isalpha():
                 var = char
-            elif char.isalnum():
-                co = char
+            elif char.isalnum() or char == '.' or char == ',':
+                co = char if not co else co + char
         else:
             term = get_var(si, co, var)
             if term:

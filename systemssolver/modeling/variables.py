@@ -46,6 +46,10 @@ class Constant(Variable):
     def val(self, new_val):
         raise RuntimeError()
 
+    @property
+    def name(self):
+        return self.val
+
     def __str__(self):
         return str(self.val) if self.val >= 0 else '-{}'.format(self.val)
 

@@ -14,3 +14,4 @@ class SolverMethod(ABC):
     @abstractmethod
     def solve(self, problem: Problem, tracer_hook: TracingHook = None) -> Solution:
         pass
+

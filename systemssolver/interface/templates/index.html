@@ -1,0 +1,90 @@
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>SystemsSolver</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/styles.css') }}">
+    <script src="{{ url_for('static', filename='scripts/index.js') }}"></script>
+</head>
+
+<body>
+<div class="full-height">
+    <h1>Systems Solver</h1>
+    <div>
+        <form>
+            <input type="button" value="Reset" id="reset">
+        </form>
+    </div>
+    <div>
+        <h2>Add an objective</h2>
+        <form>
+            Expression:
+            <input id="objectiveExpression" type="text">
+            Goal
+            <select id="objectiveGoal">
+                <option value="maximize" selected="selected">Maximize</option>
+                <option value="minimize">Minimize</option>
+            </select>
+            <input type="button" value="Add" id="addObjective">
+        </form>
+    </div>
+    <div>
+        <h2>Add a constraint</h2>
+        <form>
+            <input type="text" id="constraintLeft">
+            <select id="constraintSign">
+                <option value="=" selected="selected">=</option>
+                <option value="<"><</option>
+                <option value="<="><=</option>
+                <option value=">">></option>
+                <option value=">=">>=</option>
+                <option value="!=">!=</option>
+            </select>
+            <input type="text" id="constraintRight">
+            <input type="button" value="Add" id="addConstraint">
+        </form>
+    </div>
+    <div>
+        <h2>Current System</h2>
+        <div>
+            <h3>
+                Current Objectives
+            </h3>
+            <ul id="currentObjectives">
+
+            </ul>
+        </div>
+        <div>
+            <h3>
+                Current Constraints
+            </h3>
+            <ul id="currentConstraints"></ul>
+        </div>
+    </div>
+    <div>
+        <h2>Solve</h2>
+        <form>
+            Method:
+            <select id="solverMethod">
+                <option value="simplex" selected="selected">Simplex</option>
+                <option value="<"><</option>
+                <option value="<="><=</option>
+                <option value=">">></option>
+                <option value=">=">>=</option>
+                <option value="!=">!=</option>
+            </select>
+            Debug:
+            <input type="checkbox" name="debug" id="solverDebug">
+            <input type="button" value="Solve!" id="solve">
+        </form>
+    </div>
+    <div>
+        <h2>Solution</h2>
+        <div id="solutionSpace">
+            <ul id="solutionValues">
+
+            </ul>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -12,6 +12,13 @@ class EqualitySigns(Enum):
     GE = '>='
     NOT_EQUAL = '!='
 
+    @staticmethod
+    def from_val(val):
+        for sign in EqualitySigns:
+            if sign.value == val:
+                return sign
+        return None
+
     def apply(self, right, left) -> bool:
         return {
             EqualitySigns.EQUAL: lambda r, l: r == l,
@@ -72,10 +79,11 @@ class Expression:
     def __str__(self):
         terms = list()
         for term in self.terms:
-            if term.coef.val >= 0:
-                terms.append("{}{}{}".format("+ " if len(terms) > 0 else "", term.coef.val, term.var.name))
+            if term.coef >= 0:
+                terms.append("{}{}{}".format(
+                    "+ " if len(terms) > 0 else "", term.coef if term.coef != 1 else '', term.var.name))
             else:
-                terms.append("- {}{}".format(abs(term.coef.val), term.var.name))
+                terms.append("- {}{}".format(abs(term.coef), term.var.name))
         return ' '.join(terms)
 
     def __neg__(self):

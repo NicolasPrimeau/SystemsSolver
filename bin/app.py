@@ -1,8 +1,8 @@
-from systemssolver.interface.solver_gui import SolverGUI
+from systemssolver.interface.solver_gui import FlaskApp
 
 
 def main():
-    app = SolverGUI()
+    app = FlaskApp()
     app.start()
 
 

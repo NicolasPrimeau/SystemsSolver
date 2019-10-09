@@ -7,6 +7,13 @@ class ObjectiveGoal(Enum):
     MINIMIZE = 'minimize'
     MAXIMIZE = 'maximize'
 
+    @staticmethod
+    def from_str(item):
+        for goal in ObjectiveGoal:
+            if goal.value == item.lower():
+                return goal
+        return None
+
 
 class Objective:
 

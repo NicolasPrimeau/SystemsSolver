@@ -1,32 +1,88 @@
-import tkinter
+import json
+from http import HTTPStatus
+
+from flask import Flask, render_template, Response, request
+
+from systemssolver.methods.factory import SolverMethods
+from systemssolver.modeling.equation import EqualitySigns, Constraint
+from systemssolver.modeling.objective import ObjectiveGoal, Objective
+from systemssolver.modeling.parsing import ExpressionParser
+from systemssolver.problem import Problem
 
 
-class Window(tkinter.Frame):
+class FlaskApp:
 
-    def __init__(self, geometry, master=None):
-        super().__init__(master)
-        self.master = master
-        self.geometry = geometry
-        self.init_window()
+    def __init__(self, host='0.0.0.0', port=50000):
+        self.app = Flask(__name__)
+        self.app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
+        self.app.config['TEMPLATES_AUTO_RELOAD'] = True
+        self.host, self.port = host, port
+        self.problem = Problem()
+        self.parser = ExpressionParser()
+        self.app.add_url_rule("/", "/", self.index)
+        self.app.add_url_rule("/api/objective", "/api/objective", self.list_objectives, methods=['GET'])
+        self.app.add_url_rule("/api/objective/add", "/api/objective/add", self.add_objective, methods=['POST'])
+        self.app.add_url_rule("/api/objective/remove", "/api/objective/remove", self.remove_objective, methods=['POST'])
 
-    def init_window(self):
-        self.master.title("SystemsSolver GUI")
+        self.app.add_url_rule("/api/constraint", "/api/constraint", self.list_constraints, methods=['GET'])
+        self.app.add_url_rule("/api/constraint/add", "/api/constraint/add", self.add_constraint, methods=['POST'])
+        self.app.add_url_rule("/api/constraint/remove", "/api/constraint/remove", self.remove_constraint,
+                              methods=['POST'])
+        self.app.add_url_rule("/api/reset", "/api/reset", self.reset, methods=['POST'])
+        self.app.add_url_rule("/api/solve", "/api/solve", self.solve, methods=['POST'])
 
-        self.pack(fill=tkinter.BOTH, expand=1)
-        quit_button = tkinter.Button(self, text="Quit", command=self.client_exit)
-        quit_button.place(x=0, y=0)
+    def index(self):
+        return render_template("index.html")
 
-    def client_exit(self):
-        exit()
+    def reset(self):
+        self.problem = Problem()
+        return Response("Ok", HTTPStatus.OK, content_type="text/plain")
 
+    def list_objectives(self):
+        return Response(json.dumps({
+            'objectives': [{
+                'goal': objective.goal.value, 'expression': str(objective.expression)
+            } for objective in self.problem.objectives]
+        }), HTTPStatus.OK, content_type="application/json;charset=utf-8")
 
-class SolverGUI:
+    def add_objective(self):
+        data = request.json
+        goal = ObjectiveGoal.from_str(data['goal'])
+        expression = self.parser.parse(data['expression'])
+        self.problem.add_objective(Objective(expression=expression, goal=goal))
+        return Response('Created', HTTPStatus.CREATED, content_type="text/plain")
 
-    def __init__(self):
-        self._size = (800, 300)
-        self._root = tkinter.Tk()
-        self._app = Window(geometry=self._size, master=self._root)
-        self._root.geometry("{}x{}".format(*self._size))
+    def remove_objective(self):
+        pass
+
+    def list_constraints(self):
+        return Response(json.dumps({
+            'constraints': [{
+                'left': str(constraint.left),
+                'sign': str(constraint.sign.value),
+                'right': str(constraint.right)
+            } for constraint in self.problem.constraints
+            ]}), HTTPStatus.OK, content_type="application/json;charset=utf-8")
+
+    def add_constraint(self):
+        data = request.json
+        left = self.parser.parse(data['left'])
+        sign = EqualitySigns.from_val(data['sign'])
+        right = self.parser.parse(data['right'])
+        self.problem.add_constraint(Constraint(left=left, sign=sign, right=right))
+        return Response('Created', HTTPStatus.CREATED, content_type="text/plain")
+
+    def remove_constraint(self):
+        pass
+
+    def solve(self):
+        data = request.json
+        solver = SolverMethods.from_val(data['method']).get_solver()
+        debug = data['debug']
+        solution = solver.solve(self.problem)
+        return Response(json.dumps({
+            'vars': {var.name: var.val for var in solution.variables}
+        }), HTTPStatus.OK, content_type="application/json; charset=utf-8")
 
     def start(self):
-        self._root.mainloop()
+        self.app.run(host=self.host, port=self.port, threaded=True)
