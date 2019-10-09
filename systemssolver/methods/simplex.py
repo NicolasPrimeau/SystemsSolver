@@ -81,12 +81,15 @@ class Tableau:
         return min(range(0, len(self._tableau[-1]) - 1), key=lambda idx: self._tableau[-1][idx])
 
     def _check_valid(self):
+        if self._objective is None or len(self._constraints) == 0:
+            logging.error("Need an objective and constraints ")
+            raise RuntimeError()
 
         for constraint in self._constraints:
             if constraint.sign != EqualitySigns.EQUAL:
                 logging.error(
                     "All constraints must be formulated as {} with a slack variable".format(EqualitySigns.EQUAL.value))
-                raise RuntimeError
+                raise RuntimeError()
 
             if len(constraint.right.terms) != 1:
                 logging.error("All constraints must have a one constant on right hand side")
@@ -176,4 +179,4 @@ class SimplexSolver(SolverMethod):
         return tableau.to_solution()
 
     def can_solve(self, problem: Problem) -> bool:
-        return len(problem.objectives) == 1
+        return len(problem.objectives) == 1 and len(problem.constraints) > 0

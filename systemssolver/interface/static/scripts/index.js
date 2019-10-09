@@ -156,6 +156,15 @@ document.addEventListener("DOMContentLoaded", function(){
         solveRequest.onload = function() {
             const myNode = document.getElementById("solutionValues");
             clearElements(myNode);
+            if (solveRequest.status == 400)
+            {
+                var listElement = document.createElement("LI");
+                var textNode = document.createTextNode(solveRequest.responseText);
+                listElement.appendChild(textNode);
+                myNode.appendChild(listElement);
+                return;
+            }
+
             const solution = JSON.parse(solveRequest.responseText);
             for (var key in solution.vars)
             {

@@ -107,6 +107,9 @@ class FlaskApp:
         solver = SolverMethods.from_val(data['method']).get_solver()
         debug = data['debug']
         solution = solver.solve(self.problem)
+        if not solution:
+            return Response("Definied system is not suitable for this method.", HTTPStatus.BAD_REQUEST,
+                            content_type="text/plain")
         return Response(json.dumps({
             'vars': {var.name: var.val for var in solution.variables}
         }), HTTPStatus.OK, content_type="application/json; charset=utf-8")
